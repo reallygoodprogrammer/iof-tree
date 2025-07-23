@@ -15,6 +15,7 @@ import (
 
 func main() {
 	concurrency := flag.Int("c", 10, "concurrency level")
+	files_only := flag.Bool("f", false, "only display files (no directories)")
 	flag.Parse()
 
 	urls := flag.Args()
@@ -32,8 +33,8 @@ func main() {
 
 	passes := func(val string) bool {
 		return val != "/" && !strings.HasPrefix(val, "?") &&
-		!strings.HasPrefix(val, "http://") && !strings.HasPrefix(val, "https://") &&
-		!strings.HasPrefix(val, "/")
+			!strings.HasPrefix(val, "http://") && !strings.HasPrefix(val, "https://") &&
+			!strings.HasPrefix(val, "/")
 	}
 
 	var process func(u string)
@@ -74,7 +75,9 @@ func main() {
 						process(u + val)
 					}
 				}
-				output <- u + val
+				if !(*files_only) {
+					output <- u + val
+				}
 			}
 		})
 	}
